@@ -47,7 +47,7 @@ function DashboardLayout({ children }: ILayout) {
         <hr className="border-slate-200 my-4" />
         <Link
           href="/"
-          className="flex border-rose-200 border-1 rounded-md px-4 py-3 font-semibold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:border-rose-600 hover:text-white  transition-all"
+          className="flex items-center px-4 py-3 rounded-md font-semibold text-rose-600 hover:bg-rose-600 hover:border-rose-600 hover:text-white  transition-all"
         >
           <LogOut size={24} className="mr-4" />
           Sign out

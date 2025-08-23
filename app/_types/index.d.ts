@@ -2,4 +2,12 @@ interface ILayout {
   children: React.ReactNode;
 }
 
-export { ILayout };
+interface IMenu {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  isAvailable: boolean;
+}
+
+export { ILayout, IMenu };
