@@ -28,7 +28,7 @@ const ButtonGroupContext = createContext<IButtonGroupContext>(
 );
 
 function ButtonGroup({ children }: IButtonGroupProps) {
-  const [activeButton, setActiveButton] = useState('');
+  const [activeButton, setActiveButton] = useState('all');
   return (
     <ButtonGroupContext.Provider value={{ activeButton, setActiveButton }}>
       <div className="inline-flex items-center rounded-md border border-slate-200 bg-white p-1 text-sm shadow-sm">
