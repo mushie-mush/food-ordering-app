@@ -20,7 +20,7 @@ function ActionBar() {
     { label: 'Name (Z-A)', value: 'name-desc' },
     { label: 'Price (Low-High)', value: 'price-asc' },
     { label: 'Price (High-Low)', value: 'price-desc' },
-  ];
+  ] as const;
 
   return (
     <section className="flex justify-between mb-4">
