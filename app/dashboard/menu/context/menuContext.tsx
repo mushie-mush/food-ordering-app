@@ -16,10 +16,15 @@ import {
   useReducer,
 } from 'react';
 
+type FilterType = 'all' | 'available' | 'not-available';
+
 interface IMenuContext {
   menu: IMenu[];
+  filteredMenu: IMenu[];
   isLoading: boolean;
   error: string | null;
+  currentFilter: FilterType;
+  setFilter: (filter: FilterType) => void;
   toggleAvailability: (id: string) => void;
   createMenu: (newMenu: IMenu) => void;
   updateMenu: (updatedMenu: IMenu) => void;
@@ -28,8 +33,11 @@ interface IMenuContext {
 
 const initialState: IMenuContext = {
   menu: [],
+  filteredMenu: [],
   isLoading: false,
   error: null,
+  currentFilter: 'all',
+  setFilter: () => {},
   toggleAvailability: () => {},
   createMenu: () => {},
   updateMenu: () => {},
@@ -45,43 +53,80 @@ type MenuAction =
   | { type: 'menu/toggled'; payload: string }
   | { type: 'menu/updated'; payload: IMenu }
   | { type: 'menu/deleted'; payload: string }
+  | { type: 'filter/changed'; payload: FilterType }
   | { type: 'error'; payload: string };
+
+const getFilteredMenu = (menu: IMenu[], filter: FilterType) => {
+  switch (filter) {
+    case 'available':
+      return menu.filter((item) => item.isAvailable);
+    case 'not-available':
+      return menu.filter((item) => !item.isAvailable);
+    default:
+      return menu;
+  }
+};
 
 const reducer = (state: IMenuContext, action: MenuAction) => {
   switch (action.type) {
     case 'loading':
       return { ...state, isLoading: true };
-    case 'menu/loaded':
-      return { ...state, isLoading: false, menu: action.payload };
-    case 'menu/created':
+    case 'menu/loaded': {
+      const filteredMenu = getFilteredMenu(action.payload, state.currentFilter);
       return {
         ...state,
         isLoading: false,
-        menu: [...state.menu, action.payload],
+        menu: action.payload,
+        filteredMenu,
       };
-    case 'menu/toggled':
+    }
+    case 'menu/created': {
+      const newMenu = [...state.menu, action.payload];
       return {
         ...state,
         isLoading: false,
-        menu: state.menu.map((menu) =>
-          menu.id === action.payload
-            ? { ...menu, isAvailable: !menu.isAvailable }
-            : menu
-        ),
+        menu: newMenu,
+        filteredMenu: getFilteredMenu(newMenu, state.currentFilter),
       };
-    case 'menu/updated':
+    }
+    case 'menu/toggled': {
+      const newMenu = state.menu.map((menu) =>
+        menu.id === action.payload
+          ? { ...menu, isAvailable: !menu.isAvailable }
+          : menu
+      );
       return {
         ...state,
         isLoading: false,
-        menu: state.menu.map((menu) =>
-          menu.id === action.payload.id ? action.payload : menu
-        ),
+        menu: newMenu,
+        filteredMenu: getFilteredMenu(newMenu, state.currentFilter),
       };
-    case 'menu/deleted':
+    }
+    case 'menu/updated': {
+      const newMenu = state.menu.map((menu) =>
+        menu.id === action.payload.id ? action.payload : menu
+      );
       return {
         ...state,
         isLoading: false,
-        menu: state.menu.filter((menu) => menu.id !== action.payload),
+        menu: newMenu,
+        filteredMenu: getFilteredMenu(newMenu, state.currentFilter),
+      };
+    }
+    case 'menu/deleted': {
+      const newMenu = state.menu.filter((menu) => menu.id !== action.payload);
+      return {
+        ...state,
+        isLoading: false,
+        menu: newMenu,
+        filteredMenu: getFilteredMenu(newMenu, state.currentFilter),
+      };
+    }
+    case 'filter/changed':
+      return {
+        ...state,
+        currentFilter: action.payload,
+        filteredMenu: getFilteredMenu(state.menu, action.payload),
       };
     case 'error':
       return { ...state, isLoading: false, error: action.payload };
@@ -151,10 +196,17 @@ function MenuProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const setFilter = (filter: FilterType) => {
+    dispatch({ type: 'filter/changed', payload: filter });
+  };
+
   const value = {
     isLoading: state.isLoading,
     menu: state.menu,
+    filteredMenu: state.filteredMenu,
     error: state.error,
+    currentFilter: state.currentFilter,
+    setFilter,
     toggleAvailability,
     createMenu,
     updateMenu,
@@ -168,4 +220,4 @@ function useMenuContext() {
   return useContext(MenuContext);
 }
 
-export { MenuProvider, useMenuContext };
+export { MenuProvider, useMenuContext, type FilterType };

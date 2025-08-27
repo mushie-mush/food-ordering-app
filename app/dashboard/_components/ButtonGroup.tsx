@@ -1,17 +1,10 @@
 'use client';
 
-import {
-  createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useContext,
-  useState,
-} from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 
 interface IButtonGroupContext {
   activeButton: string;
-  setActiveButton: Dispatch<SetStateAction<string>>;
+  handleButtonChange: (value: string) => void;
 }
 
 interface IButtonProps {
@@ -21,16 +14,24 @@ interface IButtonProps {
 
 interface IButtonGroupProps {
   children: ReactNode;
+  value: string;
+  onValueChange: (value: string) => void;
 }
 
 const ButtonGroupContext = createContext<IButtonGroupContext>(
   {} as IButtonGroupContext
 );
 
-function ButtonGroup({ children }: IButtonGroupProps) {
-  const [activeButton, setActiveButton] = useState('all');
+function ButtonGroup({ children, value, onValueChange }: IButtonGroupProps) {
+  const [activeButton, setActiveButton] = useState(value);
+
+  const handleButtonChange = (newValue: string) => {
+    setActiveButton(newValue);
+    onValueChange(newValue);
+  };
+
   return (
-    <ButtonGroupContext.Provider value={{ activeButton, setActiveButton }}>
+    <ButtonGroupContext.Provider value={{ activeButton, handleButtonChange }}>
       <div className="inline-flex items-center rounded-md border border-slate-200 bg-white p-1 text-sm shadow-sm">
         {children}
       </div>
@@ -39,11 +40,11 @@ function ButtonGroup({ children }: IButtonGroupProps) {
 }
 
 function Button({ children, value }: IButtonProps) {
-  const { activeButton, setActiveButton } = useContext(ButtonGroupContext);
+  const { activeButton, handleButtonChange } = useContext(ButtonGroupContext);
   const isActive = activeButton === value;
 
   const handleButtonClick = () => {
-    setActiveButton(value);
+    handleButtonChange(value);
   };
 
   return (

@@ -7,7 +7,7 @@ import { useMenuContext } from './context/menuContext';
 import { LoaderCircle } from 'lucide-react';
 
 function MenuTable() {
-  const { menu, isLoading } = useMenuContext();
+  const { filteredMenu, isLoading } = useMenuContext();
 
   return (
     <>
@@ -23,8 +23,10 @@ function MenuTable() {
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {menu.length ? (
-              menu.map((item) => <MenuTableItem item={item} key={item.id} />)
+            {filteredMenu.length ? (
+              filteredMenu.map((item) => (
+                <MenuTableItem item={item} key={item.id} />
+              ))
             ) : isLoading ? (
               <tr>
                 <td colSpan={4} className="text-center p-4">
