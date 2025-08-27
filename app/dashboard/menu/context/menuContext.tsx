@@ -18,13 +18,17 @@ import {
 
 type FilterType = 'all' | 'available' | 'not-available';
 
+type SortType = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
+
 interface IMenuContext {
   menu: IMenu[];
   filteredMenu: IMenu[];
   isLoading: boolean;
   error: string | null;
   currentFilter: FilterType;
+  currentSort: SortType;
   setFilter: (filter: FilterType) => void;
+  setSort: (sort: SortType) => void;
   toggleAvailability: (id: string) => void;
   createMenu: (newMenu: IMenu) => void;
   updateMenu: (updatedMenu: IMenu) => void;
@@ -37,7 +41,9 @@ const initialState: IMenuContext = {
   isLoading: false,
   error: null,
   currentFilter: 'all',
+  currentSort: 'name-asc',
   setFilter: () => {},
+  setSort: () => {},
   toggleAvailability: () => {},
   createMenu: () => {},
   updateMenu: () => {},
@@ -54,6 +60,7 @@ type MenuAction =
   | { type: 'menu/updated'; payload: IMenu }
   | { type: 'menu/deleted'; payload: string }
   | { type: 'filter/changed'; payload: FilterType }
+  | { type: 'menu/sorted'; payload: { menu: IMenu[]; sort: SortType } }
   | { type: 'error'; payload: string };
 
 const getFilteredMenu = (menu: IMenu[], filter: FilterType) => {
@@ -128,6 +135,13 @@ const reducer = (state: IMenuContext, action: MenuAction) => {
         currentFilter: action.payload,
         filteredMenu: getFilteredMenu(state.menu, action.payload),
       };
+    case 'menu/sorted':
+      return {
+        ...state,
+        isLoading: false,
+        filteredMenu: action.payload.menu,
+        currentSort: action.payload.sort,
+      };
     case 'error':
       return { ...state, isLoading: false, error: action.payload };
     default:
@@ -200,13 +214,34 @@ function MenuProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'filter/changed', payload: filter });
   };
 
+  const setSort = (sort: SortType) => {
+    const sortedMenu = [...state.filteredMenu].sort((a, b) => {
+      switch (sort) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'price-asc':
+          return a.price - b.price;
+        case 'price-desc':
+          return b.price - a.price;
+        default:
+          return 0;
+      }
+    });
+
+    dispatch({ type: 'menu/sorted', payload: { menu: sortedMenu, sort } });
+  };
+
   const value = {
     isLoading: state.isLoading,
     menu: state.menu,
     filteredMenu: state.filteredMenu,
     error: state.error,
     currentFilter: state.currentFilter,
+    currentSort: state.currentSort,
     setFilter,
+    setSort,
     toggleAvailability,
     createMenu,
     updateMenu,
