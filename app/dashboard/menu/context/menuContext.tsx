@@ -60,7 +60,7 @@ type MenuAction =
   | { type: 'menu/updated'; payload: IMenu }
   | { type: 'menu/deleted'; payload: string }
   | { type: 'filter/changed'; payload: FilterType }
-  | { type: 'menu/sorted'; payload: { menu: IMenu[]; sort: SortType } }
+  | { type: 'menu/sorted'; payload: SortType }
   | { type: 'error'; payload: string };
 
 const getFilteredMenu = (menu: IMenu[], filter: FilterType) => {
@@ -74,12 +74,32 @@ const getFilteredMenu = (menu: IMenu[], filter: FilterType) => {
   }
 };
 
+const getSortedMenu = (menu: IMenu[], sort: SortType) => {
+  return [...menu].sort((a, b) => {
+    switch (sort) {
+      case 'name-asc':
+        return a.name.localeCompare(b.name);
+      case 'name-desc':
+        return b.name.localeCompare(a.name);
+      case 'price-asc':
+        return a.price - b.price;
+      case 'price-desc':
+        return b.price - a.price;
+      default:
+        return 0;
+    }
+  });
+};
+
 const reducer = (state: IMenuContext, action: MenuAction) => {
   switch (action.type) {
     case 'loading':
       return { ...state, isLoading: true };
     case 'menu/loaded': {
-      const filteredMenu = getFilteredMenu(action.payload, state.currentFilter);
+      const filteredMenu = getSortedMenu(
+        getFilteredMenu(action.payload, state.currentFilter),
+        state.currentSort
+      );
       return {
         ...state,
         isLoading: false,
@@ -93,7 +113,10 @@ const reducer = (state: IMenuContext, action: MenuAction) => {
         ...state,
         isLoading: false,
         menu: newMenu,
-        filteredMenu: getFilteredMenu(newMenu, state.currentFilter),
+        filteredMenu: getSortedMenu(
+          getFilteredMenu(newMenu, state.currentFilter),
+          state.currentSort
+        ),
       };
     }
     case 'menu/toggled': {
@@ -106,7 +129,10 @@ const reducer = (state: IMenuContext, action: MenuAction) => {
         ...state,
         isLoading: false,
         menu: newMenu,
-        filteredMenu: getFilteredMenu(newMenu, state.currentFilter),
+        filteredMenu: getSortedMenu(
+          getFilteredMenu(newMenu, state.currentFilter),
+          state.currentSort
+        ),
       };
     }
     case 'menu/updated': {
@@ -117,7 +143,10 @@ const reducer = (state: IMenuContext, action: MenuAction) => {
         ...state,
         isLoading: false,
         menu: newMenu,
-        filteredMenu: getFilteredMenu(newMenu, state.currentFilter),
+        filteredMenu: getSortedMenu(
+          getFilteredMenu(newMenu, state.currentFilter),
+          state.currentSort
+        ),
       };
     }
     case 'menu/deleted': {
@@ -126,21 +155,27 @@ const reducer = (state: IMenuContext, action: MenuAction) => {
         ...state,
         isLoading: false,
         menu: newMenu,
-        filteredMenu: getFilteredMenu(newMenu, state.currentFilter),
+        filteredMenu: getSortedMenu(
+          getFilteredMenu(newMenu, state.currentFilter),
+          state.currentSort
+        ),
       };
     }
     case 'filter/changed':
       return {
         ...state,
         currentFilter: action.payload,
-        filteredMenu: getFilteredMenu(state.menu, action.payload),
+        filteredMenu: getSortedMenu(
+          getFilteredMenu(state.menu, action.payload),
+          state.currentSort
+        ),
       };
     case 'menu/sorted':
       return {
         ...state,
         isLoading: false,
-        filteredMenu: action.payload.menu,
-        currentSort: action.payload.sort,
+        currentSort: action.payload,
+        filteredMenu: getSortedMenu(state.filteredMenu, action.payload),
       };
     case 'error':
       return { ...state, isLoading: false, error: action.payload };
@@ -214,22 +249,7 @@ function MenuProvider({ children }: { children: ReactNode }) {
   };
 
   const setSort = (sort: SortType) => {
-    const sortedMenu = [...state.filteredMenu].sort((a, b) => {
-      switch (sort) {
-        case 'name-asc':
-          return a.name.localeCompare(b.name);
-        case 'name-desc':
-          return b.name.localeCompare(a.name);
-        case 'price-asc':
-          return a.price - b.price;
-        case 'price-desc':
-          return b.price - a.price;
-        default:
-          return 0;
-      }
-    });
-
-    dispatch({ type: 'menu/sorted', payload: { menu: sortedMenu, sort } });
+    dispatch({ type: 'menu/sorted', payload: sort });
   };
 
   const value = {
