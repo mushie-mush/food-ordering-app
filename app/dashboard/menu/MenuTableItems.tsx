@@ -22,10 +22,19 @@ function MenuTableItem({ item }: { item: IMenu }) {
       >
         <td className="px-6 py-4 w-[120px]">
           <div className="w-16 h-16 bg-slate-200 rounded-md flex justify-center items-center">
-            <Salad size={32} className="text-slate-400" />
+            {item.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={item.image as string}
+                alt={item.name}
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <Salad size={32} className="text-slate-400" />
+            )}
           </div>
         </td>
-        <td className="px-6 py-4 align-middle">
+        <td className="px-6 py-4 align-middle w-[320px]">
           {item.name}{' '}
           {!item.isAvailable && (
             <span className="text-xs text-rose-700 py-1 px-1.5 bg-rose-100 rounded-md">

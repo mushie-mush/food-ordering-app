@@ -182,9 +182,8 @@ function MenuProvider({ children }: { children: ReactNode }) {
   const createMenu = async (newMenu: IMenu) => {
     try {
       dispatch({ type: 'loading' });
-      await createNewMenu(newMenu);
-      const menu = await getMenu();
-      dispatch({ type: 'menu/loaded', payload: menu });
+      const result = await createNewMenu(newMenu);
+      dispatch({ type: 'menu/created', payload: result });
     } catch (error: unknown) {
       dispatch({ type: 'error', payload: (error as Error).message });
     }
@@ -193,8 +192,8 @@ function MenuProvider({ children }: { children: ReactNode }) {
   const updateMenu = async (updatedMenu: IMenu) => {
     try {
       dispatch({ type: 'loading' });
-      await editMenu(updatedMenu);
-      dispatch({ type: 'menu/updated', payload: updatedMenu });
+      const result = await editMenu(updatedMenu);
+      dispatch({ type: 'menu/updated', payload: result });
     } catch (error: unknown) {
       dispatch({ type: 'error', payload: (error as Error).message });
     }

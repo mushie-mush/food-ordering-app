@@ -14,15 +14,50 @@ async function getMenu(): Promise<IMenu[]> {
   return data;
 }
 
+async function uploadImage(file: File) {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const uniqueName = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2)}`;
+    const filePath = `${uniqueName}.${fileExt}`;
+
+    const { data, error } = await supabase.storage
+      .from('menu')
+      .upload(filePath, file, {
+        contentType: file.type,
+        upsert: true,
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${data.fullPath}`;
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw error;
+  }
+}
+
 async function createNewMenu(newMenu: IMenu) {
-  const { error } = await supabase.from('menu').insert({
-    name: newMenu.name,
-    price: newMenu.price,
-    image: newMenu.image,
-    isAvailable: newMenu.isAvailable,
-  });
-  if (error) {
-    throw new Error(error.message);
+  try {
+    const imageUrl = await uploadImage(newMenu.image as File);
+
+    const { error } = await supabase.from('menu').insert({
+      name: newMenu.name,
+      price: newMenu.price,
+      image: imageUrl,
+      isAvailable: newMenu.isAvailable,
+    });
+
+    if (error) {
+      throw new Error('Error creating menu: ' + error.message);
+    }
+
+    return { ...newMenu, image: imageUrl };
+  } catch (error) {
+    throw error;
   }
 }
 
@@ -44,13 +79,27 @@ async function deleteMenu(id: string) {
 }
 
 async function editMenu(updatedMenu: IMenu) {
+  let imageUrl = updatedMenu.image;
+
+  if (updatedMenu.image instanceof File) {
+    imageUrl = await uploadImage(updatedMenu.image);
+  }
+
   const { error } = await supabase
     .from('menu')
-    .update(updatedMenu)
+    .update({
+      name: updatedMenu.name,
+      price: updatedMenu.price,
+      image: imageUrl,
+      isAvailable: updatedMenu.isAvailable,
+    })
     .eq('id', updatedMenu.id);
+
   if (error) {
     throw new Error(error.message);
   }
+
+  return { ...updatedMenu, image: imageUrl };
 }
 
 export { getMenu, createNewMenu, toggleMenuAvailability, deleteMenu, editMenu };

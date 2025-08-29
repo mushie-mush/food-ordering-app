@@ -4,7 +4,7 @@ import { ArrowDownWideNarrow, Plus } from 'lucide-react';
 import Button from '../_components/Button';
 import ButtonGroup from '../_components/ButtonGroup';
 import { useMenuContext, type FilterType } from './context/menuContext';
-import Dropdown from './_components/Dropdown';
+import Dropdown from '../_components/Dropdown';
 import {
   NewMenuForm,
   MenuFormOpenButton,

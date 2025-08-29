@@ -16,12 +16,13 @@ import { IMenu } from '@/app/_types';
 import { useMenuContext } from './context/menuContext';
 import { Modal } from '../_components/Modal';
 import { LoaderCircle } from 'lucide-react';
+import { FileUpload } from './_components/FileUpload';
 
 interface IMenuFormState {
   id: string;
   name: string;
   price: number | string;
-  image: string;
+  image: object | string;
   isAvailable: boolean;
 }
 
@@ -48,7 +49,7 @@ const initialState: IMenuFormState = {
 type ActionType =
   | { type: 'updated_name'; payload: string }
   | { type: 'updated_price'; payload: number }
-  | { type: 'updated_image'; payload: string }
+  | { type: 'updated_image'; payload: object | string }
   | { type: 'updated_availability'; payload: boolean };
 
 const reducer = (state: IMenuFormState, action: ActionType): IMenuFormState => {
@@ -168,18 +169,13 @@ function NewMenuForm() {
           </div>
         </div>
         <div className="flex flex-col">
-          <label htmlFor="image" className="font-medium mb-2">
-            Image
-          </label>
-          <input
-            type="text"
-            name="image"
-            id="image"
-            className="py-1.5 px-3 border border-slate-200 rounded-md"
+          <label className="font-medium mb-2">Image</label>
+          <FileUpload
             value={state.image}
-            onChange={(e) =>
-              dispatch({ type: 'updated_image', payload: e.target.value })
+            onChange={(value) =>
+              dispatch({ type: 'updated_image', payload: value })
             }
+            isLoading={isLoading}
           />
         </div>
         <div className="flex items-center">
@@ -299,18 +295,13 @@ function EditMenuForm({ menu }: { menu: IMenu }) {
           </div>
         </div>
         <div className="flex flex-col">
-          <label htmlFor="image" className="font-medium mb-2">
-            Image
-          </label>
-          <input
-            type="text"
-            name="image"
-            id="image"
-            className="py-1.5 px-3 border border-slate-200 rounded-md"
+          <label className="font-medium mb-2">Image</label>
+          <FileUpload
             value={state.image}
-            onChange={(e) =>
-              dispatch({ type: 'updated_image', payload: e.target.value })
+            onChange={(value) =>
+              dispatch({ type: 'updated_image', payload: value })
             }
+            isLoading={isLoading}
           />
         </div>
         <div className="flex items-center">
