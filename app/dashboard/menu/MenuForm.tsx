@@ -16,13 +16,13 @@ import { IMenu } from '@/app/_types';
 import { useMenuContext } from './context/menuContext';
 import { Modal } from '../_components/Modal';
 import { LoaderCircle } from 'lucide-react';
-import { FileUpload } from './_components/FileUpload';
+import { FileUpload } from '../_components/FileUpload';
 
 interface IMenuFormState {
   id: string;
   name: string;
   price: number | string;
-  image: object | string;
+  image: File | string;
   isAvailable: boolean;
 }
 
@@ -49,7 +49,7 @@ const initialState: IMenuFormState = {
 type ActionType =
   | { type: 'updated_name'; payload: string }
   | { type: 'updated_price'; payload: number }
-  | { type: 'updated_image'; payload: object | string }
+  | { type: 'updated_image'; payload: File | string }
   | { type: 'updated_availability'; payload: boolean };
 
 const reducer = (state: IMenuFormState, action: ActionType): IMenuFormState => {
