@@ -52,17 +52,6 @@ const initialState: IMenuContext = {
 
 const MenuContext = createContext<IMenuContext>(initialState);
 
-type MenuAction =
-  | { type: 'loading' }
-  | { type: 'menu/loaded'; payload: IMenu[] }
-  | { type: 'menu/created'; payload: IMenu }
-  | { type: 'menu/toggled'; payload: string }
-  | { type: 'menu/updated'; payload: IMenu }
-  | { type: 'menu/deleted'; payload: string }
-  | { type: 'filter/changed'; payload: FilterType }
-  | { type: 'menu/sorted'; payload: SortType }
-  | { type: 'error'; payload: string };
-
 const getFilteredMenu = (menu: IMenu[], filter: FilterType) => {
   switch (filter) {
     case 'available':
@@ -90,6 +79,17 @@ const getSortedMenu = (menu: IMenu[], sort: SortType) => {
     }
   });
 };
+
+type MenuAction =
+  | { type: 'loading' }
+  | { type: 'menu/loaded'; payload: IMenu[] }
+  | { type: 'menu/created'; payload: IMenu }
+  | { type: 'menu/toggled'; payload: string }
+  | { type: 'menu/updated'; payload: IMenu }
+  | { type: 'menu/deleted'; payload: string }
+  | { type: 'filter/changed'; payload: FilterType }
+  | { type: 'menu/sorted'; payload: SortType }
+  | { type: 'error'; payload: string };
 
 const reducer = (state: IMenuContext, action: MenuAction) => {
   switch (action.type) {
@@ -201,6 +201,12 @@ function MenuProvider({ children }: { children: ReactNode }) {
     fetchMenu();
   }, []);
 
+  useEffect(() => {
+    if (state.error) {
+      console.error('MenuContext Error:', state.error);
+    }
+  }, [state.error]);
+
   const toggleAvailability = async (id: string) => {
     try {
       dispatch({ type: 'loading' });
@@ -236,6 +242,8 @@ function MenuProvider({ children }: { children: ReactNode }) {
 
   const removeMenu = async (id: string) => {
     try {
+      console.log(id);
+
       dispatch({ type: 'loading' });
       await deleteMenu(id);
       dispatch({ type: 'menu/deleted', payload: id });
@@ -274,4 +282,4 @@ function useMenuContext() {
   return useContext(MenuContext);
 }
 
-export { MenuProvider, useMenuContext, type FilterType };
+export { MenuProvider, useMenuContext, type FilterType, type SortType };

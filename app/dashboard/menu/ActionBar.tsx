@@ -3,7 +3,11 @@
 import { ArrowDownWideNarrow, Plus } from 'lucide-react';
 import Button from '../_components/Button';
 import ButtonGroup from '../_components/ButtonGroup';
-import { useMenuContext, type FilterType } from './context/menuContext';
+import {
+  SortType,
+  useMenuContext,
+  type FilterType,
+} from './context/menuContext';
 import Dropdown from '../_components/Dropdown';
 import {
   NewMenuForm,
@@ -20,7 +24,7 @@ function ActionBar() {
     { label: 'Name (Z-A)', value: 'name-desc' },
     { label: 'Price (Low-High)', value: 'price-asc' },
     { label: 'Price (High-Low)', value: 'price-desc' },
-  ] as const;
+  ];
 
   return (
     <section className="flex justify-between mb-4">
@@ -35,7 +39,7 @@ function ActionBar() {
           {sortOptions.map((option) => (
             <Dropdown.Item
               key={option.value}
-              onClick={() => setSort(option.value)}
+              onClick={() => setSort(option.value as SortType)}
               active={currentSort === option.value}
             >
               {option.label}

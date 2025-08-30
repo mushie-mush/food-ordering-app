@@ -8,9 +8,19 @@ import {
 import { Calendar, CalendarOff, Edit, LoaderCircle, Salad } from 'lucide-react';
 import Button from '../_components/Button';
 import { useMenuContext } from './context/menuContext';
+import toast from 'react-hot-toast';
 
 function MenuTableItem({ item }: { item: IMenu }) {
   const { toggleAvailability, isLoading } = useMenuContext();
+
+  const handleToggleAvailability = async (id: string) => {
+    try {
+      await toggleAvailability(id);
+      toast.success('Menu availability updated');
+    } catch (error) {
+      toast.error(`Failed to update availability: ${error}`);
+    }
+  };
 
   return (
     <MenuFormProvider>
@@ -54,7 +64,7 @@ function MenuTableItem({ item }: { item: IMenu }) {
           </MenuFormOpenButton>
           <Button
             variant="secondary"
-            onClick={() => toggleAvailability(item.id)}
+            onClick={() => handleToggleAvailability(item.id)}
           >
             {isLoading ? (
               <>

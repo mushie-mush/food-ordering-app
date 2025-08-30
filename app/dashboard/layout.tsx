@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import NavItem from './_components/NavItem';
 import Link from 'next/link';
+import { Toaster } from 'react-hot-toast';
 
 function DashboardLayout({ children }: ILayout) {
   return (
@@ -56,6 +57,7 @@ function DashboardLayout({ children }: ILayout) {
       <main className="flex flex-col items-center min-h-screen w-full bg-slate-50 py-12 px-8">
         <div className="w-full max-w-[1080px]">{children}</div>
       </main>
+      <Toaster position="top-right" />
     </div>
   );
 }

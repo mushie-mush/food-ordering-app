@@ -42,7 +42,11 @@ async function uploadImage(file: File) {
 
 async function createNewMenu(newMenu: IMenu) {
   try {
-    const imageUrl = await uploadImage(newMenu.image as File);
+    let imageUrl = '';
+
+    if (newMenu.image) {
+      imageUrl = await uploadImage(newMenu.image as File);
+    }
 
     const { error } = await supabase.from('menu').insert({
       name: newMenu.name,
@@ -72,6 +76,8 @@ async function toggleMenuAvailability(id: string, isAvailable: boolean) {
 }
 
 async function deleteMenu(id: string) {
+  console.log(id);
+
   const { error } = await supabase.from('menu').delete().eq('id', id);
   if (error) {
     throw new Error(error.message);

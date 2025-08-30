@@ -17,6 +17,7 @@ import { useMenuContext } from './context/menuContext';
 import { Modal } from '../_components/Modal';
 import { LoaderCircle } from 'lucide-react';
 import { FileUpload } from '../_components/FileUpload';
+import toast from 'react-hot-toast';
 
 interface IMenuFormState {
   id: string;
@@ -121,8 +122,9 @@ function NewMenuForm() {
         price: Number(state.price),
       });
       handleCloseMenuForm();
+      toast.success('Menu created successfully');
     } catch (error) {
-      console.error('Failed to create menu:', error);
+      toast.error(`Failed to create menu: ${error}`);
     }
   };
 
@@ -237,14 +239,17 @@ function EditMenuForm({ menu }: { menu: IMenu }) {
         price: Number(state.price),
       });
       handleCloseMenuForm();
+      toast.success('Menu updated successfully');
     } catch (error) {
-      console.error('Failed to update menu:', error);
+      toast.error(`Failed to update menu: ${error}`);
     }
   };
 
-  const handleDeleteMenu = async () => {
+  const handleDeleteMenu = async (id: string) => {
     try {
-      await removeMenu(menu.id);
+      console.log(id);
+
+      await removeMenu(id);
       handleCloseMenuForm();
     } catch (error) {
       console.error('Failed to delete menu:', error);
@@ -328,7 +333,7 @@ function EditMenuForm({ menu }: { menu: IMenu }) {
             variant="danger"
             type="button"
             disabled={isLoading}
-            onClick={handleDeleteMenu}
+            onClick={() => handleDeleteMenu(menu.id)}
           >
             {isLoading ? (
               <LoaderCircle size={16} className="animate-spin" />
