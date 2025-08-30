@@ -3,11 +3,6 @@
 import { ArrowDownWideNarrow, Plus } from 'lucide-react';
 import Button from '../_components/Button';
 import ButtonGroup from '../_components/ButtonGroup';
-import {
-  SortType,
-  useMenuContext,
-  type FilterType,
-} from './context/menuContext';
 import Dropdown from '../_components/Dropdown';
 import {
   NewMenuForm,
@@ -15,9 +10,13 @@ import {
   MenuFormProvider,
   MenuFormWindow,
 } from './MenuForm';
+import { FilterType, SortType, useMenuStore } from './store/menuStore';
 
 function ActionBar() {
-  const { currentFilter, setFilter, currentSort, setSort } = useMenuContext();
+  const currentFilter = useMenuStore((state) => state.currentFilter);
+  const setFilter = useMenuStore((state) => state.setFilter);
+  const currentSort = useMenuStore((state) => state.currentSort);
+  const setSort = useMenuStore((state) => state.setSort);
 
   const sortOptions = [
     { label: 'Name (A-Z)', value: 'name-asc' },

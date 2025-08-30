@@ -13,11 +13,11 @@ import {
 } from 'react';
 import Button from '../_components/Button';
 import { IMenu } from '@/app/_types';
-import { useMenuContext } from './context/menuContext';
 import { Modal } from '../_components/Modal';
 import { LoaderCircle } from 'lucide-react';
 import { FileUpload } from '../_components/FileUpload';
 import toast from 'react-hot-toast';
+import { useMenuStore } from './store/menuStore';
 
 interface IMenuFormState {
   id: string;
@@ -111,7 +111,8 @@ function MenuFormWindow({ children }: { children: ReactNode }) {
 function NewMenuForm() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { handleCloseMenuForm } = useContext(MenuFormContext);
-  const { isLoading, createMenu } = useMenuContext();
+  const isLoading = useMenuStore((state) => state.isLoading);
+  const createMenu = useMenuStore((state) => state.createMenu);
 
   const handleCreateNewMenu = async (event: FormEvent) => {
     event.preventDefault();
@@ -228,7 +229,9 @@ function NewMenuForm() {
 function EditMenuForm({ menu }: { menu: IMenu }) {
   const [state, dispatch] = useReducer(reducer, menu);
   const { handleCloseMenuForm } = useContext(MenuFormContext);
-  const { isLoading, updateMenu, removeMenu } = useMenuContext();
+  const isLoading = useMenuStore((state) => state.isLoading);
+  const updateMenu = useMenuStore((state) => state.updateMenu);
+  const removeMenu = useMenuStore((state) => state.removeMenu);
 
   const handleEditMenu = async (event: FormEvent) => {
     event.preventDefault();

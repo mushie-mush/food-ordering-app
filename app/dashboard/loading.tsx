@@ -1,11 +1,12 @@
-import React from 'react'
+import { LoaderCircle } from 'lucide-react';
+import React from 'react';
 
 function loading() {
   return (
     <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-slate-900"></div>
+      <LoaderCircle size={24} className="animate-spin mr-2" /> Loading...
     </div>
-  )
+  );
 }
 
-export default loading
+export default loading;

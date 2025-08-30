@@ -1,13 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import ActionBar from './ActionBar';
 import MenuTableItem from './MenuTableItems';
-import { useMenuContext } from './context/menuContext';
 import { LoaderCircle } from 'lucide-react';
+import { useMenuStore } from './store/menuStore';
 
 function MenuTable() {
-  const { filteredMenu, isLoading } = useMenuContext();
+  const filteredMenu = useMenuStore((state) => state.filteredMenu);
+  const isLoading = useMenuStore((state) => state.isLoading);
+  const fetchMenu = useMenuStore((state) => state.fetchMenu);
+
+  useEffect(() => {
+    fetchMenu();
+  }, [fetchMenu]);
 
   return (
     <>

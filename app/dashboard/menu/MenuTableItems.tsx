@@ -7,11 +7,12 @@ import {
 } from './MenuForm';
 import { Calendar, CalendarOff, Edit, LoaderCircle, Salad } from 'lucide-react';
 import Button from '../_components/Button';
-import { useMenuContext } from './context/menuContext';
 import toast from 'react-hot-toast';
+import { useMenuStore } from './store/menuStore';
 
 function MenuTableItem({ item }: { item: IMenu }) {
-  const { toggleAvailability, isLoading } = useMenuContext();
+  const toggleAvailability = useMenuStore((state) => state.toggleAvailability);
+  const isLoading = useMenuStore((state) => state.isLoading);
 
   const handleToggleAvailability = async (id: string) => {
     try {
